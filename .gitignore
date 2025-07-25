@@ -29,6 +29,9 @@ MANIFEST
 # Security
 security/
 
+# notebook
+notebooks/
+
 # Data files
 src/data/csv/
 src/data/pkl/
