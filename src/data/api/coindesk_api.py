@@ -53,7 +53,7 @@ def make_request(
 def get_OHLC(
         from_date: datetime,
         to_date: datetime = datetime.now().replace(minute=0,second=0,microsecond=0),
-        pair: Asset = Asset.ADA_USD,
+        asset: Asset = Asset.ADA_USD,
         timeframe: Timeframe = Timeframe.H1,
 ) -> pd.DataFrame|None:
     
@@ -80,7 +80,7 @@ def get_OHLC(
         
         logger.info(f"Fetching chunk: {current} to {chunk_end}")
         ticks = int((chunk_end - current).total_seconds() / 60 / timeframe.value)
-        instrument = pair.value.replace('_', '-')
+        instrument = asset.value.replace('_', '-')
 
         params = {
             "groups": "OHLC",

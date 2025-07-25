@@ -5,4 +5,5 @@ from models.backtest_result import BacktestResult
 def run_backtest(
         bot_config: BotConfig, 
         backtest_config: BacktestConfig
-        ) -> BacktestResult:
+) -> BacktestResult:
+    pass

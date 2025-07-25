@@ -6,12 +6,12 @@ from typing import Literal
 from constants import EARLIEST_BACKTEST_DATE
 from datetime import datetime
 
-def get_df(pair: Asset, timeframe: Timeframe, path_append: str ="", file_type: Literal['PKL', 'CSV', 'PARQUET'] = 'PARQUET') -> pd.DataFrame:
+def get_df(asset: Asset, timeframe: Timeframe, path_append: str ="", file_type: Literal['PKL', 'CSV', 'PARQUET'] = 'PARQUET') -> pd.DataFrame:
     ext = file_type.lower()
     source_dir = path_append + f"./src/data/{ ext }/"
 
     for file in os.scandir(source_dir):
-        if pair.name in file.path and timeframe.name in file.path:
+        if asset.name in file.path and timeframe.name in file.path:
             match file_type:
                 case 'PKL':
                     return pd.read_pickle(file.path)
@@ -23,7 +23,7 @@ def get_df(pair: Asset, timeframe: Timeframe, path_append: str ="", file_type: L
     df = coindesk_api.get_OHLC(
         from_date=EARLIEST_BACKTEST_DATE,
         to_date=datetime.now(),
-        pair=pair,
+        pair=asset,
         timeframe=timeframe)
     
     if df is not None:
