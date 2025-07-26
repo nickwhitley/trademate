@@ -23,7 +23,7 @@ def get_df(asset: Asset, timeframe: Timeframe, path_append: str ="", file_type: 
     df = coindesk_api.get_OHLC(
         from_date=EARLIEST_BACKTEST_DATE,
         to_date=datetime.now(),
-        pair=asset,
+        asset=asset,
         timeframe=timeframe)
     
     if df is not None:

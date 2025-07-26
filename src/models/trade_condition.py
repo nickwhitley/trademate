@@ -1,4 +1,5 @@
 from typing import Optional
+import pandas as pd
 from pydantic import BaseModel, ConfigDict, model_validator
 from models.indicator import Indicator
 from models.condition_operator import Condition
@@ -9,6 +10,10 @@ class TradeCondition(BaseModel):
     condition: Condition
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    def is_satisfied(self, row) -> bool:
+        value = getattr(row, self.indicator.output_column)
+        return self.condition.validate_condition(value)
 
     @model_validator(mode='after')
     def check_condition_allowed(self) -> 'TradeCondition':

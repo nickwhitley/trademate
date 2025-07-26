@@ -15,7 +15,14 @@ from datetime import datetime
 @logger.catch
 def main():
     rsi_indicator = RSI()
-    trade_condition = TradeCondition(
+    entry_condition = TradeCondition(
+        indicator=rsi_indicator,
+        condition=Condition(
+            operator=ConditionOperator.less_than,
+            value=30
+            )
+    )
+    exit_condition = TradeCondition(
         indicator=rsi_indicator,
         condition=Condition(
             operator=ConditionOperator.greater_than,
@@ -25,17 +32,19 @@ def main():
     bot_config = BotConfig(
         assets=[Asset.ADA_USD],
         timeframes=[Timeframe.H1],
-        entry_conditions=[trade_condition]
+        entry_conditions=[entry_condition],
+        exit_conditions=[exit_condition]
     )
     backtest_config = BacktestConfig(
         start_date=datetime(2024,1,1),
         end_date=datetime.now(),
         starting_balance=100.00
     )
-    run_backtest(
+    result = run_backtest(
         bot_config=bot_config,
         backtest_config=backtest_config
         )
+    print(len(result.trades))
 
 
 if __name__ == "__main__":

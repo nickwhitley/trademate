@@ -32,6 +32,9 @@ security/
 # notebook
 notebooks/
 
+# backtest result
+src/backtesting/results/
+
 # Data files
 src/data/csv/
 src/data/pkl/

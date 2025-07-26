@@ -16,10 +16,11 @@ class RSI(Indicator):
                 ConditionOperator.greater_than,
                 ConditionOperator.in_range,
                 ConditionOperator.less_than
-            ]
+            ],
+            output_column=f"rsi_{window}_{source}"
         )
 
     def apply_to_df(self, df: pd.DataFrame ) -> pd.DataFrame:
         rsi_calc = RSIIndicator(close=df[self.source], window=self.window, fillna=True)
-        df['rsi'] = rsi_calc.rsi()
+        df[self.output_column] = rsi_calc.rsi()
         return df

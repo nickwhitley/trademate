@@ -8,15 +8,16 @@ class BotConfig(BaseModel):
     assets: list[Asset]
     timeframes: list[Timeframe]
     entry_conditions: list[TradeCondition]
+    exit_conditions: list[TradeCondition]
 
     @model_validator(mode='after')
-    def check_pairs(self) -> Self:
+    def check_assets(self) -> Self:
         if not self.assets:
             raise ValueError(f"must provide at least one asset for backtesting")
         return self
     
     @model_validator(mode='after')
-    def check_pairs(self) -> Self:
+    def check_timeframes(self) -> Self:
         if not self.timeframes:
             raise ValueError(f"must provide at least one timeframe for backtesting")
         return self

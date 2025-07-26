@@ -109,9 +109,9 @@ def get_OHLC(
         'CLOSE': 'close'
     }).drop(columns='timeframe')
 
-    df['timestamp'] = df['timestamp'].apply(lambda x: strftime('%m-%d-%Y %H:%M', localtime(x)))
+    df['timestamp'] = pd.to_datetime(df['timestamp'], unit='s')
 
-    file_name = f"{pair.value.replace('/', '_')}-{timeframe.name}-{from_date.strftime('%m-%d-%Y')}"
+    file_name = f"{asset.value.replace('/', '_')}-{timeframe.name}-{from_date.strftime('%m-%d-%Y')}"
     data.save_df(df=df, file_name=file_name)
 
     return df
