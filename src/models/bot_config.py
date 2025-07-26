@@ -2,9 +2,12 @@ from pydantic import BaseModel, model_validator
 from constants import Asset, Timeframe
 from typing_extensions import Self
 
+from models.trade_condition import TradeCondition
+
 class BotConfig(BaseModel):
     assets: list[Asset]
     timeframes: list[Timeframe]
+    entry_conditions: list[TradeCondition]
 
     @model_validator(mode='after')
     def check_pairs(self) -> Self:

@@ -1,9 +1,9 @@
-from pydantic import BaseModel, Float
+from pydantic import BaseModel
 from models.trade import Trade
 
 class BacktestResult(BaseModel):
     trades: list[Trade]
-    ending_balance: Float
-    max_drawdown: Float
-    average_drawdown: Float
-    percent_gain_loss: Float
+    ending_balance: float
+    max_drawdown: float
+    average_drawdown: float
+    percent_gain_loss: float
