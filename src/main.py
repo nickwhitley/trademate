@@ -36,14 +36,15 @@ def main():
         condition=Condition(operator=ConditionOperator.greater_than, value=60),
     )
     bot_config = BotConfig(
-        assets=[Asset.ADA_USD],
+        bot_name="ada_testing",
+        assets=[Asset.ADA_USD, Asset.BNB_USD, Asset.BTC_USD, Asset.SOL_USD, Asset.XRP_USD],
         timeframe=Timeframe.H1,
         entry_conditions=[entry_condition_rsi,entry_condition_ma,],
         exit_conditions=[exit_condition],
-        order_size_usd=40.0
+        order_size_usd=100.0
     )
     backtest_config = BacktestConfig(
-        start_date=datetime(2020, 1, 1),
+        start_date=datetime(2023, 1, 1),
         end_date=datetime.now(),
         starting_balance=10000.00,
     )

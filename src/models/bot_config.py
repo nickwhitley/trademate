@@ -7,6 +7,7 @@ from models.trade_condition import TradeCondition
 
 
 class BotConfig(BaseModel):
+    bot_name: str
     assets: list[Asset]
     timeframe: Timeframe
     entry_conditions: list[TradeCondition]

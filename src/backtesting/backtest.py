@@ -9,6 +9,7 @@ from models.backtest_config import BacktestConfig
 from models.backtest_result import BacktestResult
 from models.trade import Trade
 from data import data
+from backtesting.export import export_results_to_excel
 
 
 def run_backtest(
@@ -81,7 +82,7 @@ def run_backtest(
     )
     print(total_profit_loss)
     print(balance)
-    export_results_to_csv(results, "test")
+    export_results_to_excel(backtest_results=results, filename=bot_config.bot_name)
     return results
 
 
