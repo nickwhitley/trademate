@@ -1,4 +1,4 @@
-from pydantic import BaseModel, PositiveFloat, PositiveInt
+from pydantic import BaseModel, PositiveFloat
 from datetime import datetime
 from typing import Optional
 
@@ -7,5 +7,5 @@ class Trade(BaseModel):
     entry_price: PositiveFloat
     close_datetime: datetime
     close_price: PositiveFloat
-    size: Optional[PositiveInt] = None
-    size_usd: Optional[PositiveFloat] = None
+    quantity: Optional[PositiveFloat] = None
+    profit_loss: Optional[float] = None

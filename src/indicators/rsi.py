@@ -24,3 +24,7 @@ class RSI(Indicator):
         rsi_calc = RSIIndicator(close=df[self.source], window=self.window, fillna=True)
         df[self.output_column] = rsi_calc.rsi()
         return df
+    
+    def evaluate_condition(self, condition, df: pd.DataFrame, index):
+        value = df.iloc[index][self.output_column]
+        return condition.validate_condition(value)

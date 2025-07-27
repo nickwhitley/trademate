@@ -16,6 +16,8 @@ def run_backtest(
 ) -> BacktestResult:
     assets = bot_config.assets
     timeframe = bot_config.timeframe
+    balance = backtest_config.starting_balance
+    total_profit_loss = 0.0
     trades = []
     in_trade = False
     current_trade = {
@@ -23,6 +25,7 @@ def run_backtest(
         "entry_date": datetime,
         "close_price": float,
         "close_date": datetime,
+        "quantity": float
     }
 
     for asset in assets:
@@ -38,36 +41,46 @@ def run_backtest(
         for index, row in enumerate(df.itertuples(), 0):
             if in_trade:
                 all_exit_conditions_met = all(
-                    cond.is_satisfied(row, df.iloc[index-1]) for cond in bot_config.exit_conditions
+                    cond.is_satisfied(df, index) for cond in bot_config.exit_conditions
                 )
                 if all_exit_conditions_met:
                     in_trade = False
                     current_trade["close_date"] = row.timestamp
                     current_trade["close_price"] = row.open
+                    profit_loss = (current_trade['close_price'] * current_trade['quantity']) - (current_trade['entry_price'] * current_trade['quantity'])
+                    total_profit_loss += profit_loss
+                    balance += profit_loss
 
                     trade = Trade(
                         entry_datetime=current_trade["entry_date"],
                         entry_price=current_trade["entry_price"],
                         close_datetime=current_trade["close_date"],
                         close_price=current_trade["close_price"],
+                        quantity=current_trade["quantity"],
+                        profit_loss=profit_loss
                     )
                     trades.append(trade)
                     current_trade.clear()
             else:
                 all_entry_conditions_met = all(
-                    cond.is_satisfied(row, df.iloc[index-1]) for cond in bot_config.entry_conditions
+                    cond.is_satisfied(df, index) for cond in bot_config.entry_conditions
                 )
                 if all_entry_conditions_met:
                     in_trade = True
                     current_trade["entry_date"] = row.timestamp
                     current_trade["entry_price"] = row.open
+                    current_trade["quantity"] = bot_config.order_size_usd / row.open
+
     results = BacktestResult(
         trades=trades,
-        ending_balance=0.0,
+        ending_balance=balance,
         max_drawdown=0.0,
         average_drawdown=0.0,
+        gain_loss=total_profit_loss,
         percent_gain_loss=0.0,
     )
+    print(total_profit_loss)
+    print(balance)
     export_results_to_csv(results, "test")
     return results
 
@@ -84,8 +97,8 @@ def export_results_to_csv(backtest_results: BacktestResult, filename: str) -> No
         "entry_price",
         "close_datetime",
         "close_price",
-        "size",
-        "size_usd",
+        "quantity",
+        "profit_loss",
     ]
 
     with open(dest_path, mode="w", newline="") as csvfile:
@@ -103,7 +116,7 @@ def export_results_to_csv(backtest_results: BacktestResult, filename: str) -> No
                         trade.close_datetime.isoformat() if trade.close_datetime else ""
                     ),
                     "close_price": trade.close_price,
-                    "size": trade.size if trade.size is not None else "",
-                    "size_usd": trade.size_usd if trade.size_usd is not None else "",
+                    "quantity": trade.quantity if trade.quantity is not None else "",
+                    "profit_loss": trade.profit_loss if trade.profit_loss is not None else "",
                 }
             )

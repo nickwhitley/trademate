@@ -6,4 +6,5 @@ class BacktestResult(BaseModel):
     ending_balance: float
     max_drawdown: float
     average_drawdown: float
+    gain_loss: float
     percent_gain_loss: float

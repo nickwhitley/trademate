@@ -1,6 +1,7 @@
 from loguru import logger
 from data import data
 from constants import Asset, Timeframe
+from indicators.bollinger_bands import BollingerBands
 from indicators.simple_ma import MA
 from models.trade_condition import TradeCondition
 from models.indicator import Indicator
@@ -17,6 +18,7 @@ from datetime import datetime
 def main():
     rsi_indicator = RSI()
     ma_indicator = MA()
+    bb_indicator = BollingerBands()
     entry_condition_rsi = TradeCondition(
         indicator=rsi_indicator,
         condition=Condition(operator=ConditionOperator.less_than, value=30),
@@ -25,6 +27,10 @@ def main():
         indicator=ma_indicator,
         condition=Condition(operator=ConditionOperator.above_price)
     )
+    entry_condition_bb = TradeCondition(
+        indicator=bb_indicator,
+        condition=Condition(operator=ConditionOperator.open_above_hband)
+    )
     exit_condition = TradeCondition(
         indicator=rsi_indicator,
         condition=Condition(operator=ConditionOperator.greater_than, value=60),
@@ -32,13 +38,14 @@ def main():
     bot_config = BotConfig(
         assets=[Asset.ADA_USD],
         timeframe=Timeframe.H1,
-        entry_conditions=[entry_condition_rsi,entry_condition_ma],
+        entry_conditions=[entry_condition_rsi,entry_condition_ma,],
         exit_conditions=[exit_condition],
+        order_size_usd=40.0
     )
     backtest_config = BacktestConfig(
         start_date=datetime(2020, 1, 1),
         end_date=datetime.now(),
-        starting_balance=100.00,
+        starting_balance=10000.00,
     )
     result = run_backtest(bot_config=bot_config, backtest_config=backtest_config)
     print(len(result.trades))
