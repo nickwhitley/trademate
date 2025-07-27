@@ -10,7 +10,7 @@ from data.api.api_error import ApiError
 from time import strftime, localtime
 from data import data
 from loguru import logger
-from security.coindesk_key import API_kEY
+from security.coindesk_key import API_KEY
 
 BASE_URL = 'https://data-api.coindesk.com'
 DATA_LIMIT = 2000
@@ -94,7 +94,7 @@ def get_OHLC(
             "fill": "true"
         }
 
-        headers = {"Authorization": f"ApiKey {API_kEY}"}
+        headers = {"Authorization": f"ApiKey {API_KEY}"}
 
         chunk = make_request(path=path, params=params, headers=headers)
         result += chunk.get('Data', [])
