@@ -11,9 +11,9 @@ class TradeCondition(BaseModel):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    def is_satisfied(self, row) -> bool:
+    def is_satisfied(self, row, prev_row) -> bool:
         value = getattr(row, self.indicator.output_column)
-        return self.condition.validate_condition(value)
+        return self.condition.validate_condition(value, row, prev_row)
 
     @model_validator(mode='after')
     def check_condition_allowed(self) -> 'TradeCondition':
