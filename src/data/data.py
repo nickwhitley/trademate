@@ -33,16 +33,13 @@ def get_df(asset: Asset, timeframe: Timeframe, path_append: str ="", file_type: 
 
 def save_df(df: pd.DataFrame, file_name: str, path_append: str ="", file_type: Literal['PKL', 'CSV', 'PARQUET'] = 'PARQUET'):
     ext = file_type.lower()
-    dest_dir = path_append + f"./src/data/{ ext }/"
-
-    if not os.path.exists(dest_dir):
-        print("making dir")
-        os.mkdir(dest_dir)
+    dest_dir = os.path.join(path_append, f"./src/data/{ ext }/")
+    os.makedirs(dest_dir, exist_ok=True)
 
     match file_type:
         case 'PKL':
-            df.to_pickle(f"{ dest_dir }{ file_name }.pkl")
+            df.to_pickle(os.path.join(dest_dir, f"{file_name}.pkl"))
         case 'CSV':
-            df.to_csv(f"{ dest_dir }{ file_name }.csv")
+            df.to_csv(os.path.join(dest_dir, f"{file_name}.csv"))
         case 'PARQUET':
-            df.to_parquet(f"{ dest_dir }{ file_name }.parquet")
+            df.to_parquet(os.path.join(dest_dir, f"{file_name}.parquet"))

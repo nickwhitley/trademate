@@ -23,6 +23,7 @@ def run_backtest(
     balance = backtest_config.starting_balance
     total_profit_loss = 0.0
     trades = []
+    balance_history = [balance]  # Track balance after each trade
     in_trade = False
     current_trade = {
         "entry_price": float,
@@ -41,7 +42,7 @@ def run_backtest(
 
         for condition in chain(bot_config.entry_conditions, bot_config.exit_conditions):
             df = condition.indicator.apply_to_df(df)
-        print(df)
+
         for index, row in enumerate(df.itertuples(), 0):
             if in_trade:
                 all_exit_conditions_met = all(
@@ -54,6 +55,7 @@ def run_backtest(
                     profit_loss = (current_trade['close_price'] * current_trade['quantity']) - (current_trade['entry_price'] * current_trade['quantity'])
                     total_profit_loss += profit_loss
                     balance += profit_loss
+                    balance_history.append(balance)  # log balance after trade
 
                     trade = Trade(
                         asset=asset,
@@ -76,17 +78,34 @@ def run_backtest(
                     current_trade["entry_price"] = row.open
                     current_trade["quantity"] = bot_config.order_size_usd / row.open
 
+    # ✅ Compute drawdowns
+    def compute_drawdowns(history: list[float]) -> tuple[float, float]:
+        peak = history[0] if history else 0
+        drawdowns = []
+        for bal in history:
+            if bal > peak:
+                peak = bal
+            drawdowns.append(peak - bal)
+        max_dd = max(drawdowns) if drawdowns else 0
+        avg_dd = sum(drawdowns) / len(drawdowns) if drawdowns else 0
+        return max_dd, avg_dd
+
+    max_dd, avg_dd = compute_drawdowns(balance_history)
+
+    gain_loss = balance - backtest_config.starting_balance
+    percent_gain_loss = (gain_loss / backtest_config.starting_balance) * 100 if backtest_config.starting_balance else 0
+
     results = BacktestResult(
         trades=trades,
-        ending_balance=balance,
-        max_drawdown=0.0,
-        average_drawdown=0.0,
-        gain_loss=total_profit_loss,
-        percent_gain_loss=0.0,
+        ending_balance=round(balance, 2),
+        max_drawdown=round(max_dd, 2),
+        average_drawdown=round(avg_dd, 2),
+        gain_loss=round(gain_loss, 2),
+        percent_gain_loss=round(percent_gain_loss, 2),
     )
-    print(total_profit_loss)
-    print(balance)
-    # export_results_to_excel(backtest_results=results, backtest_config=backtest_config, filename=bot_config.bot_name)
+    print(f"Total P/L: {total_profit_loss}")
+    print(f"Final Balance: {balance}")
+    print(f"Max DD: {max_dd} | Avg DD: {avg_dd} | % Gain: {percent_gain_loss:.2f}%")
     return results
 
 
