@@ -11,6 +11,7 @@ from models.trade import Trade
 from data import data
 from openpyxl import Workbook
 from openpyxl.utils.dataframe import dataframe_to_rows
+from openpyxl import load_workbook
 # from backtesting.export import export_results_to_excel
 
 
@@ -85,71 +86,55 @@ def run_backtest(
     )
     print(total_profit_loss)
     print(balance)
-    export_results_to_excel(backtest_results=results, backtest_config=backtest_config, filename=bot_config.bot_name)
+    # export_results_to_excel(backtest_results=results, backtest_config=backtest_config, filename=bot_config.bot_name)
     return results
 
 
-def export_results_to_excel(backtest_results: BacktestResult, backtest_config: BacktestConfig, filename: str) -> None:
-    if not filename.lower().endswith(".xlsx"):
-        filename += ".xlsx"
+# def export_results_to_excel(backtest_results: BacktestResult, backtest_config: BacktestConfig, filename: str) -> None:
+#     template_path = Path('./src/backtesting/results/backtest_results_template.xlsx')
+#     output_path = template_path.parent / f"{filename}.xlsx"
 
-    results_folder = Path(__file__).parent / "results"
-    results_folder.mkdir(parents=True, exist_ok=True)
-    dest_path = results_folder / filename
+#     workbook = load_workbook(template_path)
 
-    trade_data = []
-    for trade in backtest_results.trades:
-        trade_data.append({
-            "asset": trade.asset.value,
-            "entry_datetime": (
-                trade.entry_datetime.isoformat() if trade.entry_datetime else ""
-            ),
-            "entry_price": trade.entry_price,
-            "close_datetime": (
-                trade.close_datetime.isoformat() if trade.close_datetime else ""
-            ),
-            "close_price": trade.close_price,
-            "quantity": trade.quantity if trade.quantity is not None else "",
-            "profit_loss": trade.profit_loss if trade.profit_loss is not None else "",
-        })
-    df_trades = pd.DataFrame(trade_data)
+#     trades_data = [
+#         {
+#             "asset": str(trade.asset),  # Adjust if asset has fields like trade.asset.symbol
+#             "entry_datetime": trade.entry_datetime,
+#             "entry_price": trade.entry_price,
+#             "close_datetime": trade.close_datetime,
+#             "close_price": trade.close_price,
+#             "quantity": trade.quantity,
+#             "profit_loss": trade.profit_loss
+#         }
+#         for trade in backtest_results.trades
+#     ]
+#     trades_df = pd.DataFrame(trades_data)
 
-    wb = Workbook()
+#     # 2. Prepare backtest summary row
+#     headers = [
+#         "start_date", "end_date", "starting_balance",
+#         "ending_balance", "gain/loss", "percent_gain",
+#         "max_drawdown", "average_drawdown"
+#     ]
+#     summary_row = [[
+#         backtest_config.start_date,
+#         backtest_config.end_date,
+#         backtest_config.starting_balance,
+#         backtest_results.ending_balance,
+#         backtest_results.gain_loss,
+#         backtest_results.percent_gain_loss,
+#         backtest_results.max_drawdown,
+#         backtest_results.average_drawdown
+#     ]]
+#     summary_df = pd.DataFrame(summary_row, columns=headers)
 
-    ws_dashboard = wb.active
-    ws_dashboard.title = "Dashboard"
-    ws_dashboard["A1"] = "This sheet can be used for dashboard visuals."
+#     # 3. Save to Excel using openpyxl
+#     with pd.ExcelWriter(output_path, engine='openpyxl', mode='a', if_sheet_exists='replace') as writer:
+#         # Use the loaded workbook with writer
+#         writer = pd.ExcelWriter(template_path)  # Use private API only because `book` is not settable
 
-    ws_data = wb.create_sheet("Backtest Data")
+#         # Write the sheets
+#         trades_df.to_excel(writer, sheet_name='trades', index=False)
+#         summary_df.to_excel(writer, sheet_name='backtest_data', index=False)
 
-    ws_data["A1"] = "Backtest Configuration"
-    config_items = {
-        "start_date": backtest_config.start_date.isoformat(),
-        "end_date": backtest_config.end_date.isoformat(),
-        "starting_balance": backtest_config.starting_balance
-    }
-    for i, (key, value) in enumerate(config_items.items(), start=2):
-        ws_data.cell(row=i, column=1, value=key)
-        ws_data.cell(row=i, column=2, value=value)
-
-    
-    summary_items = {
-        "ending_balance": backtest_results.ending_balance,
-        "max_drawdown": backtest_results.max_drawdown,
-        "average_drawdown": backtest_results.average_drawdown,
-        "gain_loss": backtest_results.gain_loss,
-        "percent_gain_loss": backtest_results.percent_gain_loss,
-    }
-    summary_start = len(config_items) + 4
-    ws_data.cell(row=summary_start - 1, column=1, value="Backtest Result Summary")
-    for i, (key, value) in enumerate(summary_items.items(), start=summary_start):
-        ws_data.cell(row=i, column=1, value=key)
-        ws_data.cell(row=i, column=2, value=value)
-
-    trade_start = summary_start + len(summary_items) + 2
-    for r_idx, row in enumerate(dataframe_to_rows(df_trades, index=False, header=True), start=trade_start):
-        for c_idx, value in enumerate(row, start=1):
-            ws_data.cell(row=r_idx, column=c_idx, value=value)
-
-    wb.save(dest_path)
-
+#     print(f"Exported backtest results to: {output_path}")

@@ -33,7 +33,7 @@ security/
 notebooks/
 
 # backtest result
-src/backtesting/results/
+# src/backtesting/results/
 
 # Data files
 src/data/csv/
