@@ -13,7 +13,9 @@ from backtesting.backtest import run_backtest
 from models.backtest_config import BacktestConfig
 from datetime import datetime
 import asyncio
-# from gui.home import ui
+from gui import home
+from nicegui import ui
+import os
 
 @logger.catch
 def main():
@@ -56,4 +58,4 @@ def main():
 
 
 if __name__ in {"__main__", "__mp_main__"}:
-    main()
+    ui.run(host='0.0.0.0', port=int(os.environ.get("PORT", 8080)), dark=True)

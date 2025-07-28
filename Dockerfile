@@ -3,6 +3,7 @@ FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV PYTHONPATH=/app/src
 
 WORKDIR /app
 
@@ -13,12 +14,19 @@ COPY . .
 
 EXPOSE 8080
 
-# Run the app with Python (not uvicorn!)
-CMD ["python", "src/gui/home.py"]
+CMD ["python", "src/main.py"]
 
 # gcloud builds submit --tag gcr.io/trademate-467219/trademate-app
-# gcloud run deploy trademate-app \
-#   --image gcr.io/trademate-467219/trademate-app \
-#   --platform managed \
-#   --region us-central1 \
-#   --allow-unauthenticated
+# gcloud run deploy trademate-app   \
+# --image gcr.io/trademate-467219/trademate-app   \
+# --platform managed   \
+# --region us-central1   \
+# --allow-unauthenticated \
+# --set-env-vars "GCS_BUCKET=trademate-bucket-1"
+
+
+# 719319333800-compute@developer.gserviceaccount.com
+
+# gcloud projects add-iam-policy-binding trademate-467219 \
+#   --member=serviceAccount:719319333800-compute@developer.gserviceaccount.com \
+#   --role=roles/storage.objectAdmin
