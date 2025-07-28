@@ -12,10 +12,13 @@ from models.bot_config import BotConfig
 from backtesting.backtest import run_backtest
 from models.backtest_config import BacktestConfig
 from datetime import datetime
-
+import asyncio
+# from gui.home import ui
 
 @logger.catch
 def main():
+    # ui.run(host='0.0.0.0', port=8080, dark=True)
+
     rsi_indicator = RSI()
     ma_indicator = MA()
     bb_indicator = BollingerBands()
@@ -52,5 +55,5 @@ def main():
     print(len(result.trades))
 
 
-if __name__ == "__main__":
+if __name__ in {"__main__", "__mp_main__"}:
     main()
