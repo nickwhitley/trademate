@@ -1,5 +1,20 @@
-from nicegui import ui
+from nicegui import ui, app
 import asyncio
+
+ui.add_head_html("""
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.body.classList.add('q-dark');
+    document.querySelector('html').classList.add('q-dark');
+  });
+</script>
+<style>
+  body {
+    background-color: #121212 !important;
+    color: #ffffff !important;
+  }
+</style>
+""")
 
 TIMEFRAMES = ['H1', 'D']
 ASSETS = ['BTC', 'ETH', 'XRP', 'FARTCOIN']
@@ -37,20 +52,44 @@ def history_page():
 
 def add_RSI():
     ui.number(label = 'Window', value = 14, format = "%1.0f")
-    ui.select(['Open', 'High', 'Low', 'Close'], multiple = False, label = "Source:").classes('w-48 h-10')
+    ui.select(['Open',
+                'High',
+                'Low',
+                'Close'], multiple = False, label = "Source:").classes('w-48 h-10')
+    ui.select(['<', 
+               '>', 
+               '='], multiple = False, label = "Action On:").classes('w-48 h-10')
 
 def add_simple_ma():
     ui.number(label = 'Window', value = 9, format = "%1.0f")
-    ui.select(['Open', 'High', 'Low', 'Close'], multiple = False, label = "Source:").classes('w-48 h-10')
+    ui.select(['Open', 
+               'High', 
+               'Low', 
+               'Close'], multiple = False, label = "Source:").classes('w-48 h-10')
+    ui.select(['Above price', 
+               'Below price', 
+               'At price', 
+               'Cross above price', 
+               'Cross below price'], multiple = False, label = "Action On:").classes('w-48 h-10')
 
 def add_MACD():
     ui.number(label = 'Slow Window', value = 26, format = "%1.0f")
     ui.number(label = 'Fast Window', value = 12, format = "%1.0f")
     ui.number(label = 'Signal Window', value = 9, format = "%1.0f")
+    ui.select(['<', 
+               '>', 
+               '='], multiple = False, label = "Action On:").classes('w-48 h-10')
 
 def add_boilinger():
     ui.number(label = 'Window', value = 12, format = "%1.0f")
     ui.number(label = "Window Deviation", value = 3, format = "%1.0f")
+    ui.select(['Open above Hband', 
+               'Open below Lband', 
+               'Close above Hband', 
+               'Close below Lband', 
+               'Inside Lband', 
+               'Inside Hband', 
+               'Inside bands' ], multiple = False, label = "Action On:").classes('w-48 h-10')
 
 def add_stocastic_oscilator():
     ui.number(label = 'Window', value = 12, format = "%1.0f")
@@ -58,6 +97,9 @@ def add_stocastic_oscilator():
 
 def add_ATR():
     ui.number(label = 'Window', value = 12, format = "%1.0f")
+    ui.select(['<', 
+               '>', 
+               '='], multiple = False, label = "Action On:").classes('w-48 h-10')
 
 def add_fields(container):
     with container:
@@ -130,8 +172,9 @@ def start_page():
 
         with ui.card().classes('col-start-2 row-start-6 row-span-1'):
             ui.button("Run Backtest", on_click=run_backtest)
+            # ui.button('dark', on_click=dark.enable)
 
-ui.run(title='dashboard layout')
+ui.run(host='0.0.0.0', port=8080, dark=True)
 
 
 
