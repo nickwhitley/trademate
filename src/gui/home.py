@@ -1,20 +1,6 @@
 from nicegui import ui, app
 import asyncio
 
-ui.add_head_html("""
-<script>
-  document.addEventListener('DOMContentLoaded', function () {
-    document.body.classList.add('q-dark');
-    document.querySelector('html').classList.add('q-dark');
-  });
-</script>
-<style>
-  body {
-    background-color: #121212 !important;
-    color: #ffffff !important;
-  }
-</style>
-""")
 
 TIMEFRAMES = ['H1', 'D']
 ASSETS = ['BTC', 'ETH', 'XRP', 'FARTCOIN']
@@ -31,24 +17,6 @@ async def run_backtest():
     n.spinner = False
     await asyncio.sleep(1)
     n.dismiss()
-
-
-@ui.page('/home')
-def home_page():
-    ui.label("Home page")
-    ui.button('Go Back', on_click=lambda: ui.navigate('/'))
-
-@ui.page('/results')
-def results_page():
-    ui.label("Results page")
-
-@ui.page('/History')
-def history_page():
-    ui.label("History page")
-
-
-
-
 
 def add_RSI():
     ui.number(label = 'Window', value = 14, format = "%1.0f")
